@@ -1,4 +1,4 @@
-=WWBE?
+=Comparing The Eating Habits of Two Generations in the US
 :neo4j-version: 2.3.0
 :author: Alicia Powers
 :twitter: @apowers411
@@ -62,3 +62,21 @@ RETURN path
 //graph_result
 
 // REMOVEME: Offer a conclusion
+
+
+
+
+
+
+<ul class="graph-diagram-markup" data-internal-scale="3.17" data-external-scale="1">
+  <li class="node" data-node-id="0" data-x="-6204.308441701555" data-y="3639.875179555156">
+    <span class="caption">Food</span><dl class="properties"><dt>{location</dt><dd>Grocery Store}</dd></dl></li>
+  <li class="node" data-node-id="1" data-x="-6432.924174281387" data-y="3458.2854769971855">
+    <span class="caption">Person</span><dl class="properties"><dt>{id</dt><dd>123}</dd><dt>{ageyears</dt><dd>5.4}</dd><dt>{female</dt><dd>1}</dd><dt>{bmi</dt><dd>23.1}</dd></dl></li>
+  <li class="node" data-node-id="5" data-x="-6432.924174281387" data-y="3639.875179555156">
+    <span class="caption">Events</span><dl class="properties"><dt>{id</dt><dd>1232}</dd><dt>{eventtime</dt><dd>UNIXtimestamp}</dd><dt>{name</dt><dd>Breakfast}</dd><dt>{dayofweek</dt><dd>Friday}</dd></dl></li>
+  <li class="relationship" data-from="1" data-to="5">
+    <span class="type">Has_event</span><dl class="properties"><dt>{athome</dt><dd>'ate at home'}</dd></dl></li>
+  <li class="relationship" data-from="5" data-to="0">
+    <span class="type">consumes</span><dl class="properties"><dt>{amount</dt><dd>5 grams}</dd><dt>{calories</dt><dd>120}</dd></dl></li>
+</ul>
