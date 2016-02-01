@@ -1,0 +1,145 @@
+== Comparing The Eating Habits of Two Generations in the US
+=== Alicia Powers <apowers411@gmail.com>
+=== twitter: @apowers411
+[.lead]
+// Provide an introduction to your data modeling domain and what you are trying to accomplish
+As an introduction to Neo4j, I use the Center for Disease Control and Prevention's National Health and Nutrition Examination Survey to look at the eating habits of two different generations of Americans.  I was inspired to look at this problem when I saw the graph below. The graph shows that in recent years the obesity rate in many countries has increased.  I wondered if the increase in obesity rate are due to poorer eating habits and higher BMI among the youth or all people are seeing an increase BMI.  One way to better understand the differences between generations is to look at how people of different ages are eating.
+
+
+image::https://raw.githubusercontent.com/drpowpow/GraphGist/master/_76107417_20140707_obesity_countries_v3.jpg[]
+
+
+
+// Provide a domain model image (using something like http://www.apcjones.com/arrows/# or https://www.gliffy.com/)
+Using the available data, I created the following model.  Each person has a node. The label on the node is the person's age in years.  You should see people under the age of 22 and over the age of 65.  The minimum age is 8 months old and the oldest person is 80 years old. Additional data include gender, BMI, and weight in lbs. Each person node is connected to eating events by the relationship 'has_event.'  These events are snacks, meals and drinks. Event properties include the time and day of the event. The relationship has the property of whether the event took place at home or away.
+
+Events (i.e. meals) are linked to Food nodes by the relationship 'consume.' The relationship properties detail the amount and nutritional information.  Finally, each food 'belong_to' a food group. 
+
+
+
+image::https://raw.githubusercontent.com/drpowpow/GraphGist/master/AnnotatedModel.jpg[]
+
+
+
+// You can run this query to get an overview of entities and how they are related:
+
+// REMOVEME: A Cypher query to setup the database
+//setup
+//hide
+[source,cypher]
+----
+CREATE CONSTRAINT ON (c:Person) ASSERT c.id is UNIQUE;
+CREATE CONSTRAINT ON (e:Events) ASSERT e.id is UNIQUE;
+CREATE CONSTRAINT ON (f:Food) ASSERT f.id is UNIQUE;
+CREATE CONSTRAINT ON (fg:Food) ASSERT fg.foodgroup is UNIQUE;
+
+USING PERIODIC COMMIT
+LOAD CSV WITH HEADERS FROM "file:////Users/apowers/Dev/GraphGist/peoplegist.csv" AS line
+CREATE (person:Person {id: line.id, ageyears: toFloat(line.ageyears), female: toInt(line.female),bmi:toFloat(line.bmi),  weightlbs:toFloat(line.weightlbs)})
+
+----
+
+// REMOVEME: Display the whole graph:
+
+//graph
+
+// REMOVEME: Describe what this query is designed to do
+
+// REMOVEME: A Cypher query to give table output
+[source,cypher]
+----
+USING PERIODIC COMMIT
+LOAD CSV WITH HEADERS FROM "file:////Users/apowers/Dev/GraphGist/eventswithfoodgist.csv" AS line
+MERGE (event:Events  {id: line.mealid,name:line.eventname, dayofweek: line.dayofweek, eventtime:toFloat(line.eventtime)}) 
+MERGE (food:Food {id:line.foodid, name:line.name})
+MERGE (foodgroup:FoodGroup {foodgroup:line.FoodGroup})
+
+MATCH (person:Person {id:line.personid}),(event:Events {id:line.mealid})
+MERGE (person)-[:has_event {athome:line.eathome}]->(event);
+
+MATCH (event:Events {id:line.mealid}),(food:Food {id:line.foodid})
+MERGE (event)-[:consumes {fat:line.fat,sugar:line.sugar,protein:line.protein,fiber:line.fiber,amount:line.amount,calories:line.calories,foodsource:line.foodsource}]->(food)
+
+MATCH (food:Food {id:line.foodid}),(foodgroup:FoodGroup {foodgroup:line.FoodGroup})
+MERGE (food)-[:belongs_to]->(foodgroup)
+----
+
+
+
+
+//console
+//table
+
+// REMOVEME: Describe what this query is designed to do
+
+// REMOVEME: A Cypher query to give graph visualization output
+[source,cypher]
+----
+MATCH path=(a:Person {name: 'Alice'})-[:FRIENDS_WITH]-(:Person)-[:FRIENDS_WITH]-(fof:Person)
+RETURN path
+----
+
+//graph_result
+
+// REMOVEME: Offer a conclusion
+
+
+
+
+CREATE CONSTRAINT ON (c:Person) ASSERT c.id is UNIQUE;
+CREATE CONSTRAINT ON (e:Events) ASSERT e.id is UNIQUE;
+CREATE CONSTRAINT ON (f:Food) ASSERT f.id is UNIQUE;
+CREATE CONSTRAINT ON (fg:Food) ASSERT fg.foodgroup is UNIQUE;
+
+USING PERIODIC COMMIT
+LOAD CSV WITH HEADERS FROM "file:////Users/apowers/Dev/GraphGist/peoplegist.csv" AS line
+CREATE (person:Person {id: line.id, ageyears: toFloat(line.ageyears),raceeth: line.raceeth,marriedorcohab: toInt(line.marriedorcohab),divorced: toInt(line.divorced),single: toInt(line.single),totalhh: toFloat(line.totalhh),widowed: toInt(line.widowed),less5yearsinUS: toInt(line.less5yearsinUS),military: toInt(line.military),incomeratio: toFloat(line.incomeratio), female: toInt(line.female),bmi:toFloat(line.bmi), heightinch:toFloat(line.heightinch), weightlbs:toFloat(line.weightlbs), moneyatsupermarket:toFloat(line.moneyatsupermarket), moneyfoodotherstore:toFloat(line.moneyfoodotherstore), moneynonfood:toFloat(line.moneynonfood), moneyeatingout: toFloat(line.moneyeatingout), moneycarrydelivery: toFloat(line.moneycarrydelivery)})
+
+
+// REMOVEME: A Cypher query to setup the database
+//setup
+//hide
+[source,cypher]
+----
+CREATE
+  (a:Person {name: 'Alice'}),
+  (b:Person {name: 'Bob'}),
+  (c:Person {name: 'Carrie'}),
+  (d:Person {name: 'David'}),
+  (e:Person {name: 'Emily'}),
+  (a)-[:FRIENDS_WITH]->(b),
+  (a)-[:FRIENDS_WITH]->(e),
+  (b)-[:FRIENDS_WITH]->(c),
+  (b)-[:FRIENDS_WITH]->(d)
+----
+
+// REMOVEME: Display the whole graph:
+
+//graph
+
+// REMOVEME: Describe what this query is designed to do
+
+// REMOVEME: A Cypher query to give table output
+[source,cypher]
+----
+MATCH (a:Person {name: 'Alice'})-[:FRIENDS_WITH]-(:Person)-[:FRIENDS_WITH]-(fof:Person)
+RETURN fof.name
+----
+//console
+//table
+
+// REMOVEME: Describe what this query is designed to do
+
+// REMOVEME: A Cypher query to give graph visualization output
+[source,cypher]
+----
+MATCH path=(a:Person {name: 'Alice'})-[:FRIENDS_WITH]-(:Person)-[:FRIENDS_WITH]-(fof:Person)
+RETURN path
+----
+
+//graph_result
+
+// REMOVEME: Offer a conclusion
+
+
+
